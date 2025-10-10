@@ -1,0 +1,642 @@
+=== Missing Units ===
+- bag
+- batch
+- big handful
+- bottle
+- box
+- cloves cloves
+- container
+- cup cup
+- cups cups
+- envelope
+- handful
+- heaping
+- heaping cup
+- heaping cups
+- inches pieces
+- large bunch
+- large can
+- large cloves
+- large head
+- ounces packages
+- plump cloves
+- recipe
+- ribs
+- scoops
+- sheets
+- small bunch
+- small heads
+- sprig
+- strips
+- thick slices
+
+=== Missing Foods ===
+- (brown gravy mix)
+- a generous crack of black pepper
+- a neutral oil
+- acini de pepe pasta
+- active dry yeast
+- adjust
+- almond
+- almond butter
+- almond milk
+- andouille sausage
+- andouille sausages
+- any asian greens
+- apple cider vinegar
+- apple juice
+- applesauce (chunky-style)
+- apricot
+- artichoke hearts
+- arugula
+- avocado
+- bacon
+- bacon bit
+- baking powder
+- baking soda
+- balsamic vinegar
+- banana
+- banana frozen
+- barbecue sauce
+- basil
+- basil pesto
+- basmati rice and indian flatbread
+- bay leaf
+- bbq sauce
+- beef broth
+- beef broth chicken broth
+- beef stock
+- beef top sirloin steaks
+- beets
+- bell peppers
+- black bean
+- black lentil
+- black olive
+- black-eyed pea
+- blueberry
+- boiled rice
+- boiling water
+- boneless chicken
+- boneless pork loin chop
+- boneless pork shoulder
+- boneless skinless chicken breast
+- boneless skinless chicken breasts
+- boneless, skinless chicken breasts
+- bread
+- bread crumb
+- bread flour
+- bread machine yeast
+- bread machine yeast ()
+- bread machine yeast (instant yeast)
+- bread per person
+- broccoli
+- broccoli florets
+- broccoli stems
+- brown
+- brown lentils
+- brown sugar
+- brussels sprouts
+- burrito-size flour tortillas
+- butter
+- butter lettuce leaves
+- buttermilk biscuits
+- butternut squash
+- cajun seasoning
+- canned black bean
+- canned diced tomatoes with chilies
+- canned kidney bean
+- canned tomato sauce
+- canned tuna
+- cannellini bean
+- canola oil
+- caper
+- capsicum / bell pepper
+- carrot
+- catalina dressing
+- cayenne
+- cayenne pepper
+- celery
+- celery seed
+- cheddar cheese
+- cheddar mexican blend cheese
+- cheese
+- cheese tortellini
+- cherry tomato
+- chia seeds
+- chicken bouillon granules
+- chicken breast
+- chicken breast fillets
+- chicken broth
+- chicken stock
+- chicken thigh
+- chicken thighs boneless
+- chicken wing
+- chickpea
+- chili garlic oil
+- chili powder
+- chinese rice vinegar
+- chives
+- chocolate chip
+- chorizo sausage
+- cilantro
+- cinnamon
+- cinnamon stick
+- clam
+- clam juice
+- clementine
+- coconut milk
+- coconut oil
+- colby-jack cheese
+- cold cooked rice
+- cold water
+- condensed cream of mushroom soup
+- cooked chicken
+- cooking spray
+- coriander
+- corn
+- corn kernels
+- corn tortilla
+- cornflour (cornstarch)
+- cornstarch
+- cotija cheese
+- cottage cheese
+- could not detect ingredients
+- cracker
+- cracker black pepper
+- cream
+- cream cheese
+- cream of chicken soup mix:
+- creamy peanut butter
+- creamy salted natural peanut butter
+- crushed red pepper
+- crushed red pepper flakes
+- crushed tomatoes
+- crushed tomatoes with basil
+- crusty sub rolls
+- cube
+- cucumber
+- cumin
+- curry powder
+- cut into florets
+- dark soy sauce
+- date
+- deli ham
+- diced green chile
+- diced tomatoes
+- dijon mustard
+- dill pickle relish
+- dried basil
+- dried basil leaves
+- dried basil*
+- dried berry
+- dried fruit
+- dried italian season
+- dried mango
+- dried oregano
+- dried oregano*
+- dried parsley flake
+- dried pea
+- dried rosemary
+- dried rosemary leaves
+- dried sage*
+- dried split peas
+- dried thyme
+- dried thyme leaves
+- dried thyme*
+- dry
+- dry fettuccine pasta
+- dry noodles
+- dry red lentils
+- dry white wine
+- dukes mayo
+- egg
+- egg noodle
+- eggplant
+- eggs
+- elbow macaroni
+- english cucumber
+- english muffin
+- extra light olive oil
+- extra virgin olive oil
+- fennel seed
+- feta cheese
+- filling of choice
+- fine sea salt
+- fire-roasted tomato
+- firm fish fillet
+- fish sauce
+- flaked sea salt
+- flaky sea salt
+- flat-leaf parsley
+- flax seeds
+- flour
+- flour tortilla
+- fontina cheese
+- forest fruit
+- frank's wings hot sauce
+- free-range eggs
+- fresh
+- fresh arugula
+- fresh basil
+- fresh basil leaves
+- fresh berries and mint sprigs
+- fresh bocconcini mozzarella
+- fresh collard greens
+- fresh ginger
+- fresh mint
+- fresh mint leaves
+- fresh orange juice
+- fresh oregano
+- fresh pepper
+- fresh pineapple
+- fresh red chili
+- fresh rosemary
+- fresh spinach
+- fresh thyme leaves
+- fresh tomatoes
+- fresh turmeric
+- frozen banana
+- frozen burger patties
+- frozen green peas
+- frozen mixed berries
+- frozen mixed peas & carrots*
+- frozen peas
+- frozen pineapple chunks
+- frozen stir-fry vegetables
+- frozen sweet corn
+- frozen tater tots
+- fruit
+- fruit jam
+- fruit of choice**
+- full fat coconut milk
+- full-fat coconut milk
+- fusilli pasta
+- garam masala
+- garlic
+- garlic powder
+- garnish with sesame seeds
+- ginger
+- ginger- cut across the grain
+- golden raisins
+- good quality chicken stock
+- good quality olive oil
+- granola
+- granulated garlic & onion powder
+- granulated sugar
+- grape jelly
+- grape tomatoes (quartered)
+- green apple
+- green bean
+- green cabbage
+- green onion
+- green tomato
+- ground
+- ground beef
+- ground beef/mince
+- ground cloves
+- ground coriander
+- ground coriander seed
+- ground flaxseed
+- ground ginger
+- ground italian sausage
+- ground nutmeg
+- ground pork
+- ground turmeric
+- ground white pepper
+- guacamole
+- half & half
+- half and half
+- ham
+- heavy cream
+- heavy whipping cream
+- herbe de provence
+- herbs
+- hoagie rolls
+- hoisin sauce
+- homemade caesar dressing*
+- honey
+- honeycrisp apples
+- hot pepper sauce
+- hot sauce
+- ice cubes
+- iceberg leaf lettuce
+- iceberg lettuce
+- indian red chili powder
+- instant yeast
+- italian bread crumb
+- italian dressing
+- italian herb seasoning blend
+- italian herbs seasoning ()
+- italian salad dressing
+- italian seasoning
+- jalapeno
+- jasmine rice
+- jell-o sugar free vanilla instant pudding
+- jimmy dean® original hearty pork sausage crumbles
+- juice from orange
+- kalamata olive
+- kalamata olives pitted
+- kale
+- ketchup
+- kidney bean
+- kiwi fruit
+- kosher salt & black pepper
+- lasagna noodle
+- leaves
+- left whole*
+- lemon
+- lemon vinaigrette
+- lemon zest
+- lemongrass
+- lettuce
+- light brown sugar
+- light cream
+- light olive oil
+- light soy sauce
+- lime
+- lime wedge
+- linked below
+- liquid smoke
+- local honey
+- long grain white rice
+- long-grain rice
+- long-grain white rice
+- low sodium soy sauce
+- low-fat plain yoghurt
+- low-sodium chicken broth
+- low-sodium soy sauce
+- low-sodium vegetable broth
+- low-sodium vegetable broth +
+- macaroni noodles
+- mandarin oranges
+- mandarin oranges in light syrup
+- mango
+- maple syrup
+- marinara sauce
+- mature cheddar
+- mayo
+- mayonnaise
+- meat from 1 rotisserie chicken*
+- meaty ham bone
+- medium
+- medjool dates
+- mexican cheese blend
+- microgreen
+- mild chili powder
+- milk
+- milk ((warm))
+- milk (warm)
+- mint
+- mint leaves
+- minute oatmeal
+- minute® white rice
+- mirin
+- mix of red cabbage
+- mixed vegetable
+- molass
+- monterey jack cheese
+- mozzarella
+- mozzarella balls
+- mushroom
+- mustard
+- mustard powder
+- napa cabbage
+- neutral cooking oil
+- nonfat plain greek yogurt
+- note
+- nuts
+- oatmeal
+- oats
+- oil spray
+- oils
+- old fashioned oatmeal
+- old-fashioned oats
+- olive oil
+- onion
+- onion powder
+- oranges
+- oregano
+- oyster sauce
+- pancetta
+- panko bread crumbs
+- panko breadcrumbs
+- panko crumbs
+- paprika
+- parmesan
+- parmesan cheese
+- parmesan vegan parmesan
+- parmigiano-reggiano cheese
+- parsley
+- parsnip
+- pasta
+- pasta egg noodles of choice
+- peanut
+- peanut butter
+- peanut oil
+- pecorino cheese
+- pecorino parmesan cheese*
+- penne pasta
+- penne rigate
+- pepitas
+- pepper
+- pepperoncini
+- pepperoni
+- persian cucumber
+- persian cucumbers
+- pesto
+- pesto & dolloping
+- petite diced tomatoes
+- pickle relish
+- pico de gallo
+- pine nut
+- pineapple chunks
+- pineapple juice
+- pizza dough
+- plain (all-purpose) flour
+- plain doritos
+- plain flour
+- plain frozen tater tots
+- plain vegan yogurt
+- pomegranate arils
+- pomegranate molass
+- pork and bean
+- pork chop
+- pork shoulder (pork butt)
+- pork tenderloin
+- portions dried ramen noodles
+- potato flake
+- potatoes
+- prepared coleslaw dressing
+- prepared sushi rice
+- preserves
+- protein powder
+- provolone cheese
+- provolone cheese mild
+- purple cabbage
+- queso fresco
+- radish
+- ramen eggs
+- ranch dressing
+- ras el hanout
+- raspberry
+- raw almonds
+- raw shrimp
+- red bell
+- red cabbage
+- red capsicum /
+- red lentil
+- red onion
+- red pepper
+- red pepper flakes
+- red potatoes
+- red seedless grapes
+- red wine
+- reduced sodium soy sauce
+- refined coconut oil
+- refried bean
+- ribeye steak
+- rice
+- rice vinegar
+- rice wine vinegar
+- rigatoni
+- ripe banana
+- ripe peaches
+- roasted chickpea
+- roasted ratatouille
+- roasted red pepper
+- roasted unsalted almonds
+- rolled oat
+- roma tomatoes
+- romaine lettuce
+- rotisserie chicken
+- salami
+- salmon fillets
+- salsa
+- salt
+- salt &
+- salt & pepper
+- salt /
+- salt-free curry powder
+- sandwich bread
+- sashimi-grade raw salmon
+- scallion
+- scotch fillet steak /
+- sea salt
+- seasoned pepper
+- see
+- seedless grapes
+- semi-skimmed milk
+- semisweet chocolate chips
+- serrano pepper
+- serve over / rice and naan bread with additional lime wedges
+- serving suggestions
+- sesame oil
+- sesame seeds
+- shallot
+- sharp cheddar cheese
+- shiitake mushroom
+- shredded cheese
+- shredded coconut
+- shrimp
+- skin and bones
+- skin on
+- skinless boneless chicken thighs
+- skinless, boneless chicken breast halves
+- smoked mozzarella cheese
+- smoked paprika
+- soft lettuce
+- sour cream
+- sourdough bread
+- soy sauce
+- spaghetti
+- spicy sausage
+- spinach
+- spinach leaves
+- spring onion
+- spring roll rice wrappers
+- sriracha
+- sriracha sauce
+- stewed tomato
+- strawberry
+- strawberry greek yogurt
+- sub rolls
+- sugar
+- sun dried tomato
+- sunflower oil
+- sushi seaweed (aka nori)
+- sweet baby ray's
+- sweet chilli sauce
+- sweet italian sausage
+- sweet onion
+- sweet paprika
+- sweet pickle relish
+- sweet potato
+- sweetened coconut flakes
+- taco seasoning
+- tahini sauce
+- tamari
+- thai red curry paste
+- thick bacon
+- thick-cut bacon
+- thinly-sliced okra*
+- thyme
+- tilapia
+- toasted sesame oil
+- tomato
+- tomato paste
+- tomato sauce
+- torn basil leaves
+- tortilla chip
+- tortilla shells
+- trimmed fresh broccoli
+- tuna in water
+- tuna packed in water
+- unbaked pie crusts
+- unsalted
+- unsalted butter (-1 stick)
+- unsweetened almond milk
+- unsweetened creamy almond butter
+- use smoked salt
+- vanilla extract
+- vanilla greek yogurt
+- vegan protein powder
+- vegetable / chicken stock
+- vegetable broth
+- vegetable oil
+- vegetarian broth
+- vermicelli rice noodles
+- vinegar
+- walnut
+- warm milk
+- warm water
+- water ((warm))
+- water (warm)
+- white balsamic vinegar
+- white bean
+- white corn tortillas
+- white granulated sugar
+- white granulated sugar ()
+- white jasmine rice
+- white onion
+- white pepper
+- white rice
+- white sugar
+- whole almonds
+- whole chuck roast
+- whole garlic
+- whole milk (warm)
+- whole onions
+- whole peeled tomatoes
+- whole plum tomatoes (including juice)
+- whole spaghetti squash
+- wholegrain mustard
+- worcestershire sauce
+- yam
+- yellow bell pepper
+- yellow cornmeal
+- yellow curry powder
+- yellow mustard
+- yellow onion
+- yogurt
+- zucchini
+- ▢ optional add ins
