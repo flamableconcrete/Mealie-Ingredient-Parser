@@ -1,0 +1,6 @@
+aiohttp
+python-dotenv
+tqdm
+requests
+rich
+textual
