@@ -1,15 +1,19 @@
 """Modal screens for unit management."""
 
+from loguru import logger
 from textual import on
 from textual.app import ComposeResult
 from textual.binding import Binding
 from textual.containers import Container, Horizontal
+from textual.reactive import reactive
 from textual.screen import ModalScreen
-from textual.widgets import Button, Input, Label
+from textual.widgets import Button, Input, Label, Static
+
+from mealie_parser.validation import validate_abbreviation, validate_unit_name
 
 
 class CreateUnitModal(ModalScreen):
-    """Modal for creating a new unit"""
+    """Modal for creating a new unit with validation"""
 
     CSS = """
     CreateUnitModal {
@@ -28,6 +32,12 @@ class CreateUnitModal(ModalScreen):
         margin: 1 0;
     }
 
+    #validation-errors {
+        color: $error;
+        margin: 0 0 1 0;
+        height: auto;
+    }
+
     #button-container {
         height: auto;
         align: center middle;
@@ -39,9 +49,12 @@ class CreateUnitModal(ModalScreen):
         Binding("escape", "cancel", "Cancel"),
     ]
 
-    def __init__(self, unit_name: str):
+    validation_errors = reactive("")
+
+    def __init__(self, unit_name: str, existing_units: list[dict]):
         super().__init__()
         self.unit_name = unit_name
+        self.existing_units = existing_units
         self.result = None
 
     def compose(self) -> ComposeResult:
@@ -51,12 +64,67 @@ class CreateUnitModal(ModalScreen):
             yield Input(value=self.unit_name[:3], id="abbreviation")
             yield Label("Description (optional):")
             yield Input(id="description")
+            yield Static("", id="validation-errors")
             with Horizontal(id="button-container"):
                 yield Button("Create", variant="primary", id="create")
                 yield Button("Cancel", variant="default", id="cancel")
 
+    def on_mount(self) -> None:
+        """Validate unit name on mount."""
+        self.validate_inputs()
+
+    @on(Input.Changed, "#abbreviation")
+    def on_abbreviation_changed(self, event: Input.Changed) -> None:
+        """Validate on abbreviation change."""
+        self.validate_inputs()
+
+    def validate_inputs(self) -> bool:
+        """
+        Validate unit name and abbreviation.
+
+        Returns
+        -------
+        bool
+            True if validation passes, False otherwise
+        """
+        errors = []
+
+        # Validate unit name
+        name_result = validate_unit_name(self.unit_name, self.existing_units)
+        if not name_result.is_valid:
+            errors.extend(name_result.errors)
+
+        # Validate abbreviation
+        abbr_input = self.query_one("#abbreviation", Input)
+        abbr_result = validate_abbreviation(abbr_input.value)
+        if not abbr_result.is_valid:
+            errors.extend(abbr_result.errors)
+
+        # Update validation errors
+        self.validation_errors = "\n".join(errors)
+
+        # Enable/disable create button
+        create_btn = self.query_one("#create", Button)
+        create_btn.disabled = len(errors) > 0
+
+        if errors:
+            logger.debug(f"Validation failed for unit '{self.unit_name}': {errors}")
+
+        return len(errors) == 0
+
+    def watch_validation_errors(self, errors: str) -> None:
+        """Update validation errors display."""
+        error_widget = self.query_one("#validation-errors", Static)
+        error_widget.update(errors)
+
     @on(Button.Pressed, "#create")
     def on_create(self):
+        # Final validation check
+        if not self.validate_inputs():
+            logger.warning("Attempted to create unit with validation errors")
+            self.notify("Cannot create unit: validation errors", severity="error")
+            return
+
         abbreviation = self.query_one("#abbreviation", Input).value
         description = self.query_one("#description", Input).value
         self.result = {
@@ -64,6 +132,7 @@ class CreateUnitModal(ModalScreen):
             "abbreviation": abbreviation,
             "description": description,
         }
+        logger.info(f"Creating unit: {self.unit_name}")
         self.dismiss(self.result)
 
     @on(Button.Pressed, "#cancel")

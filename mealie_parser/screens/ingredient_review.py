@@ -1,7 +1,6 @@
 """Screen for reviewing parsed ingredients."""
 
-import logging
-
+from loguru import logger
 from textual import on
 from textual.app import ComposeResult
 from textual.binding import Binding
@@ -23,8 +22,6 @@ from ..modals import (
     SelectFoodModal,
     UnitActionModal,
 )
-
-logger = logging.getLogger(__name__)
 
 
 class IngredientReviewScreen(Screen):
@@ -67,9 +64,7 @@ class IngredientReviewScreen(Screen):
         Binding("escape", "back", "Back", show=True),
     ]
 
-    def __init__(
-        self, recipe, parsed_ingredients, session, known_units_full, known_foods_full
-    ):
+    def __init__(self, recipe, parsed_ingredients, session, known_units_full, known_foods_full):
         super().__init__()
         self.recipe = recipe
         self.parsed_ingredients = parsed_ingredients
@@ -128,9 +123,7 @@ class IngredientReviewScreen(Screen):
         table.add_row("Notes", parsed_ing.get("note", ""))
 
         status = self.query_one("#status-bar", Static)
-        status.update(
-            f"Ingredient {self.current_index + 1}/{len(self.parsed_ingredients)}"
-        )
+        status.update(f"Ingredient {self.current_index + 1}/{len(self.parsed_ingredients)}")
 
         # Check for missing unit/food and handle
         self.check_and_handle_missing()
@@ -162,7 +155,7 @@ class IngredientReviewScreen(Screen):
         action = await self.app.push_screen_wait(UnitActionModal(unit_name))
 
         if action == "create":
-            unit_data = await self.app.push_screen_wait(CreateUnitModal(unit_name))
+            unit_data = await self.app.push_screen_wait(CreateUnitModal(unit_name, self.known_units_full))
             if unit_data:
                 try:
                     new_unit = await create_unit(
@@ -173,71 +166,89 @@ class IngredientReviewScreen(Screen):
                     )
                     self.stats["units_created"].append(new_unit["name"])
                     self.known_units_full = await get_units_full(self.session)
-                    self.notify(f"✓ Created unit '{unit_name}'", severity="information", timeout=3)
+                    self.notify(
+                        f"✓ Created unit '{unit_name}'",
+                        severity="information",
+                        timeout=3,
+                    )
                 except Exception as e:
                     logger.error(f"Failed to create unit '{unit_name}': {e}", exc_info=True)
                     self.notify(f"✗ Error creating unit: {e}", severity="error", timeout=3)
         elif action == "skip":
             logger.info(f"Skipped creating unit: {unit_name}")
 
-    async def handle_missing_food(self, food_name):
+    async def _create_new_food(self, food_name: str, allow_custom: bool = False) -> None:
+        """Create a new food entry.
+
+        Parameters
+        ----------
+        food_name : str
+            Name of the food to create
+        allow_custom : bool, optional
+            Whether to allow custom food name, by default False
+        """
+        food_data = await self.app.push_screen_wait(
+            CreateFoodModal(food_name, self.known_foods_full, allow_custom=allow_custom)
+        )
+        if food_data:
+            try:
+                new_food = await create_food(self.session, food_data["name"], food_data["description"])
+                self.stats["foods_created"].append(new_food["name"])
+                self.known_foods_full = await get_foods_full(self.session)
+                self.notify(
+                    f"✓ Created food '{food_data['name']}'",
+                    severity="information",
+                    timeout=3,
+                )
+            except Exception as e:
+                logger.error(f"Failed to create food '{food_data['name']}': {e}", exc_info=True)
+                self.notify(f"✗ Error creating food: {e}", severity="error", timeout=3)
+
+    async def _add_food_alias(self, food_name: str) -> None:
+        """Add food name as alias to existing food.
+
+        Parameters
+        ----------
+        food_name : str
+            Alias name to add to selected food
+        """
+        selection = await self.app.push_screen_wait(SelectFoodModal(self.known_foods_full, food_name))
+        if selection and selection.get("add_alias"):
+            selected_food = selection["food"]
+            try:
+                await add_food_alias(self.session, selected_food["id"], food_name)
+                self.stats["aliases_created"].append(f"{food_name} → {selected_food['name']}")
+                self.known_foods_full = await get_foods_full(self.session)
+                self.notify(
+                    f"✓ Added '{food_name}' as alias to '{selected_food['name']}'",
+                    severity="information",
+                    timeout=3,
+                )
+            except Exception as e:
+                logger.error(
+                    f"Failed to add alias '{food_name}' to '{selected_food.get('name', 'unknown')}': {e}",
+                    exc_info=True,
+                )
+                self.notify(f"✗ Error adding alias: {e}", severity="error", timeout=3)
+
+    async def handle_missing_food(self, food_name: str) -> None:
+        """Handle missing food by prompting user for action.
+
+        Parameters
+        ----------
+        food_name : str
+            Name of the missing food
+        """
         logger.info(f"Handling missing food: {food_name}")
         action = await self.app.push_screen_wait(FoodActionModal(food_name))
 
         if action == "create":
-            food_data = await self.app.push_screen_wait(CreateFoodModal(food_name))
-            if food_data:
-                try:
-                    new_food = await create_food(
-                        self.session, food_data["name"], food_data["description"]
-                    )
-                    self.stats["foods_created"].append(new_food["name"])
-                    self.known_foods_full = await get_foods_full(self.session)
-                    self.notify(f"✓ Created food '{food_name}'", severity="information", timeout=3)
-                except Exception as e:
-                    logger.error(f"Failed to create food '{food_name}': {e}", exc_info=True)
-                    self.notify(f"✗ Error creating food: {e}", severity="error", timeout=3)
-
+            await self._create_new_food(food_name)
         elif action == "custom":
-            food_data = await self.app.push_screen_wait(
-                CreateFoodModal(food_name, allow_custom=True)
-            )
-            if food_data:
-                try:
-                    new_food = await create_food(
-                        self.session, food_data["name"], food_data["description"]
-                    )
-                    self.stats["foods_created"].append(new_food["name"])
-                    self.known_foods_full = await get_foods_full(self.session)
-                    self.notify(
-                        f"✓ Created food '{food_data['name']}'", severity="information", timeout=3
-                    )
-                except Exception as e:
-                    logger.error(f"Failed to create food '{food_data['name']}': {e}", exc_info=True)
-                    self.notify(f"✗ Error creating food: {e}", severity="error", timeout=3)
-
+            await self._create_new_food(food_name, allow_custom=True)
         elif action == "select":
-            selection = await self.app.push_screen_wait(
-                SelectFoodModal(self.known_foods_full, food_name)
-            )
-            if selection and selection.get("add_alias"):
-                selected_food = selection["food"]
-                try:
-                    await add_food_alias(self.session, selected_food["id"], food_name)
-                    self.stats["aliases_created"].append(
-                        f"{food_name} → {selected_food['name']}"
-                    )
-                    self.known_foods_full = await get_foods_full(self.session)
-                    self.notify(
-                        f"✓ Added '{food_name}' as alias to '{selected_food['name']}'",
-                        severity="information",
-                        timeout=3
-                    )
-                except Exception as e:
-                    logger.error(f"Failed to add alias '{food_name}' to '{selected_food.get('name', 'unknown')}': {e}", exc_info=True)
-                    self.notify(f"✗ Error adding alias: {e}", severity="error", timeout=3)
-
-        if action == "skip":
+            await self._add_food_alias(food_name)
+        elif action == "skip":
             logger.info(f"Skipped creating food: {food_name}")
 
     @on(Button.Pressed, "#next-btn")

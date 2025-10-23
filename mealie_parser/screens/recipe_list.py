@@ -1,18 +1,15 @@
 """Screen showing list of unparsed recipes."""
 
-import logging
-
+from loguru import logger
 from textual import on, work
 from textual.app import ComposeResult
 from textual.binding import Binding
 from textual.containers import Container, Horizontal
 from textual.screen import Screen
-from textual.widgets import Button, DataTable, Footer, Header, Label, Static
+from textual.widgets import Button, DataTable, Footer, Static
 
 from ..api import get_foods_full, get_recipe_details, get_units_full, parse_ingredients
 from .ingredient_review import IngredientReviewScreen
-
-logger = logging.getLogger(__name__)
 
 
 class RecipeListScreen(Screen):
@@ -20,7 +17,38 @@ class RecipeListScreen(Screen):
 
     CSS = """
     RecipeListScreen {
+        layout: vertical;
         background: $surface;
+    }
+
+    #title-bar {
+        height: 3;
+        background: $primary;
+        padding: 0 2;
+        content-align: center middle;
+    }
+
+    #title {
+        text-style: bold;
+        color: $text;
+        text-align: center;
+        width: 100%;
+    }
+
+    #controls {
+        height: auto;
+        layout: horizontal;
+        align: left middle;
+        background: $panel;
+        padding: 1 2;
+    }
+
+    #controls Button {
+        margin: 0 1;
+    }
+
+    #back-button {
+        min-width: 20;
     }
 
     #main-container {
@@ -32,16 +60,6 @@ class RecipeListScreen(Screen):
         height: 1fr;
     }
 
-    #button-container {
-        height: auto;
-        align: center middle;
-        padding: 1;
-    }
-
-    Button {
-        margin: 0 1;
-    }
-
     #status-bar {
         height: 3;
         background: $panel;
@@ -50,8 +68,8 @@ class RecipeListScreen(Screen):
     """
 
     BINDINGS = [
+        Binding("escape", "back", "Back", show=True),
         Binding("r", "review", "Review Selected", show=True),
-        Binding("q", "quit", "Quit", show=True),
     ]
 
     def __init__(self, unparsed_recipes, session, known_units_full, known_foods_full):
@@ -67,15 +85,15 @@ class RecipeListScreen(Screen):
         }
 
     def compose(self) -> ComposeResult:
-        yield Header()
+        with Container(id="title-bar"):
+            yield Static("Recipe Mode", id="title")
+        with Horizontal(id="controls"):
+            yield Button("← Back [escape]", id="back-button", variant="default")
+            yield Button("Review Selected [r]", variant="primary", id="review-btn")
         with Container(id="main-container"):
-            yield Label("Unparsed Recipes", id="title")
             table = DataTable(id="recipe-table", cursor_type="row")
             table.add_columns("Recipe Name", "Slug")
             yield table
-            with Horizontal(id="button-container"):
-                yield Button("Review Selected", variant="primary", id="review-btn")
-                yield Button("Quit", variant="error", id="quit-btn")
         yield Static(id="status-bar")
         yield Footer()
 
@@ -140,20 +158,16 @@ class RecipeListScreen(Screen):
             await self.app.push_screen_wait(review_screen)
 
             # Update stats
-            self.total_stats["units_created"].extend(
-                review_screen.stats["units_created"]
-            )
-            self.total_stats["foods_created"].extend(
-                review_screen.stats["foods_created"]
-            )
-            self.total_stats["aliases_created"].extend(
-                review_screen.stats["aliases_created"]
-            )
+            self.total_stats["units_created"].extend(review_screen.stats["units_created"])
+            self.total_stats["foods_created"].extend(review_screen.stats["foods_created"])
+            self.total_stats["aliases_created"].extend(review_screen.stats["aliases_created"])
 
-            logger.info(f"Completed review of recipe: {recipe['name']} - "
-                       f"Units: +{len(review_screen.stats['units_created'])}, "
-                       f"Foods: +{len(review_screen.stats['foods_created'])}, "
-                       f"Aliases: +{len(review_screen.stats['aliases_created'])}")
+            logger.info(
+                f"Completed review of recipe: {recipe['name']} - "
+                f"Units: +{len(review_screen.stats['units_created'])}, "
+                f"Foods: +{len(review_screen.stats['foods_created'])}, "
+                f"Aliases: +{len(review_screen.stats['aliases_created'])}"
+            )
 
             # Refresh data
             self.known_units_full = await get_units_full(self.session)
@@ -162,9 +176,14 @@ class RecipeListScreen(Screen):
             self.update_status()
 
         except Exception as e:
-            logger.error(f"Error reviewing recipe '{recipe.get('name', 'unknown')}' (slug: {recipe.get('slug', 'unknown')}): {e}", exc_info=True)
+            logger.error(
+                f"Error reviewing recipe '{recipe.get('name', 'unknown')}' (slug: {recipe.get('slug', 'unknown')}): {e}",
+                exc_info=True,
+            )
             self.notify(f"Error reviewing recipe: {e}", severity="error", timeout=3)
 
-    @on(Button.Pressed, "#quit-btn")
-    def action_quit(self):
-        self.app.exit()
+    @on(Button.Pressed, "#back-button")
+    def action_back(self):
+        """Return to mode selection screen."""
+        logger.info("Returning from Recipe List screen")
+        self.app.pop_screen()

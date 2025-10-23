@@ -13,12 +13,8 @@ def is_recipe_unparsed(recipe_ingredients):
 
     for ing in recipe_ingredients:
         if isinstance(ing, dict):
-            has_food = ing.get("food") and (
-                isinstance(ing["food"], dict) and ing["food"].get("id")
-            )
-            has_unit = ing.get("unit") and (
-                isinstance(ing["unit"], dict) and ing["unit"].get("id")
-            )
+            has_food = ing.get("food") and (isinstance(ing["food"], dict) and ing["food"].get("id"))
+            has_unit = ing.get("unit") and (isinstance(ing["unit"], dict) and ing["unit"].get("id"))
             has_text = ing.get("note") or ing.get("originalText")
 
             if has_text and not (has_food or has_unit):
@@ -59,9 +55,65 @@ def extract_missing_units(parsed_ingredients, known_units):
                     missing_units[unit_name] = {
                         "suggestion": unit_name,
                         "count": 0,
-                        "ingredients": []
+                        "ingredients": [],
                     }
                 missing_units[unit_name]["count"] += 1
                 missing_units[unit_name]["ingredients"].append(original_text)
 
     return missing_units
+
+
+def find_unit_by_name(name: str, units_list: list[dict]) -> dict | None:
+    """
+    Find a unit by name with case-insensitive matching and whitespace normalization.
+
+    Parameters
+    ----------
+    name : str
+        The unit name to search for
+    units_list : list[dict]
+        List of unit dictionaries from Mealie API
+
+    Returns
+    -------
+    dict or None
+        The matching unit dictionary, or None if not found
+    """
+    if not name:
+        return None
+
+    name_normalized = name.lower().strip()
+
+    for unit in units_list:
+        if unit.get("name", "").lower().strip() == name_normalized:
+            return unit
+
+    return None
+
+
+def find_food_by_name(name: str, foods_list: list[dict]) -> dict | None:
+    """
+    Find a food by name with case-insensitive matching and whitespace normalization.
+
+    Parameters
+    ----------
+    name : str
+        The food name to search for
+    foods_list : list[dict]
+        List of food dictionaries from Mealie API
+
+    Returns
+    -------
+    dict or None
+        The matching food dictionary, or None if not found
+    """
+    if not name:
+        return None
+
+    name_normalized = name.lower().strip()
+
+    for food in foods_list:
+        if food.get("name", "").lower().strip() == name_normalized:
+            return food
+
+    return None

@@ -6,7 +6,7 @@ from textual.containers import Container, Horizontal, Vertical
 from textual.screen import Screen
 from textual.widgets import Button, Footer, Header, Static
 
-from .batch_units import BatchUnitsScreen
+from .pattern_group import PatternGroupScreen
 from .recipe_list import RecipeListScreen
 
 
@@ -20,11 +20,11 @@ class ModeSelectionScreen(Screen):
     }
 
     #mode-container {
-        width: 60;
+        width: 80;
         height: auto;
         background: $panel;
         border: thick $primary;
-        padding: 1 2;
+        padding: 2 3;
     }
 
     #title {
@@ -36,13 +36,13 @@ class ModeSelectionScreen(Screen):
 
     #description {
         text-align: center;
-        margin: 1 0;
+        margin: 1 0 2 0;
         color: $text-muted;
     }
 
     .mode-section {
         margin: 1 0;
-        padding: 1;
+        padding: 1 2;
         background: $boost;
         border: round $primary-lighten-1;
         height: auto;
@@ -64,12 +64,13 @@ class ModeSelectionScreen(Screen):
     }
 
     #quit-container {
-        margin-top: 1;
+        margin-top: 2;
         align: center middle;
     }
 
     #quit-btn {
         width: auto;
+        min-width: 20;
     }
     """
 
@@ -79,12 +80,20 @@ class ModeSelectionScreen(Screen):
         Binding("q", "quit", "Quit", show=True),
     ]
 
-    def __init__(self, unparsed_recipes, session, known_units_full, known_foods_full):
+    def __init__(
+        self,
+        unparsed_recipes,
+        session,
+        known_units_full,
+        known_foods_full,
+        all_patterns=None,
+    ):
         super().__init__()
         self.unparsed_recipes = unparsed_recipes
         self.session = session
         self.known_units_full = known_units_full
         self.known_foods_full = known_foods_full
+        self.all_patterns = all_patterns or []
 
     def compose(self) -> ComposeResult:
         yield Header()
@@ -106,7 +115,7 @@ class ModeSelectionScreen(Screen):
             with Vertical(classes="mode-section"):
                 yield Static("Batch Mode", classes="mode-title")
                 yield Static(
-                    "Bulk add missing units and foods across multiple recipes at once",
+                    "Parse ingredients in bulk using NLP, Brute Force, or OpenAI methods",
                     classes="mode-description",
                 )
                 yield Button("Start Batch Mode [2]", variant="success", id="batch-mode-btn")
@@ -137,12 +146,14 @@ class ModeSelectionScreen(Screen):
 
     def action_batch_mode(self) -> None:
         """Switch to batch processing mode"""
+        # Use PatternGroupScreen with parsing workflow
         self.app.push_screen(
-            BatchUnitsScreen(
-                self.unparsed_recipes,
-                self.session,
-                self.known_units_full,
-                self.known_foods_full,
+            PatternGroupScreen(
+                patterns=self.all_patterns,
+                unparsed_recipes=self.unparsed_recipes,
+                session=self.session,
+                known_units=self.known_units_full,
+                known_foods=self.known_foods_full,
             )
         )
 

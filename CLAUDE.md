@@ -6,6 +6,44 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Mealie Ingredient Parser is a Textual TUI application for processing unparsed recipe ingredients in a Mealie instance. It identifies recipes with unparsed ingredients, uses Mealie's NLP parser to process them, and provides an interactive interface for creating missing units/foods or adding aliases to existing ones.
 
+## Code Style and Quality
+
+**IMPORTANT:** This project follows strict Python coding standards documented in [STYLE_GUIDE.md](STYLE_GUIDE.md).
+
+### Quick Reference
+
+- **Formatter/Linter:** ruff (configured in `pyproject.toml`)
+- **Line Length:** 120 characters
+- **Quotes:** Double quotes (`"`)
+- **Type Hints:** Required for all function signatures
+- **Docstrings:** NumPy-style for all public APIs
+- **Import Organization:** Automatic via ruff (stdlib → third-party → local)
+
+### Before Editing Python Files
+
+**ALWAYS run ruff after editing Python files:**
+
+```bash
+# Format the file
+uv run ruff format path/to/file.py
+
+# Check for issues
+uv run ruff check path/to/file.py
+
+# Auto-fix issues
+uv run ruff check --fix path/to/file.py
+```
+
+### Naming Conventions
+
+- **Modules:** `snake_case` (e.g., `pattern_analyzer.py`)
+- **Classes:** `PascalCase` (e.g., `PatternAnalyzer`)
+- **Functions/Methods:** `snake_case` (e.g., `parse_ingredient()`)
+- **Constants:** `UPPER_SNAKE_CASE` (e.g., `MAX_RETRIES`)
+- **Boolean functions:** Prefix with `is_`, `has_`, `should_`
+
+See [STYLE_GUIDE.md](STYLE_GUIDE.md) for complete guidelines.
+
 ## Environment Setup
 
 Requires Python >=3.13 and uses uv for dependency management.

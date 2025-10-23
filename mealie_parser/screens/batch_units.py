@@ -1,17 +1,24 @@
 """Batch mode screen for adding missing units across multiple recipes."""
 
 import asyncio
-import logging
 
+from loguru import logger
 from textual import on, work
 from textual.app import ComposeResult
 from textual.binding import Binding
 from textual.containers import Container, Horizontal, Vertical
 from textual.screen import Screen
-from textual.widgets import Button, DataTable, Footer, Header, Label, ProgressBar, Static
+from textual.widgets import (
+    Button,
+    DataTable,
+    Footer,
+    Header,
+    Label,
+    ProgressBar,
+    Static,
+)
 
 from ..api import (
-    add_unit_alias,
     create_unit,
     get_recipe_details,
     get_units_full,
@@ -20,8 +27,6 @@ from ..api import (
 )
 from ..config import BATCH_SIZE
 from ..utils import extract_missing_units
-
-logger = logging.getLogger(__name__)
 
 
 class BatchUnitsScreen(Screen):
@@ -140,29 +145,139 @@ class BatchUnitsScreen(Screen):
     async def on_mount(self):
         asyncio.create_task(self.load_batch_data())
 
-    async def load_batch_data(self):
-        """Load and parse ingredients from batch of recipes"""
+    def _handle_empty_batch(self) -> None:
+        """Handle case where no recipes are in current batch."""
+        status = self.query_one("#status-bar", Static)
+        progress_bar = self.query_one("#progress-bar", ProgressBar)
+        create_btn = self.query_one("#create-btn", Button)
+        next_btn = self.query_one("#next-btn", Button)
+        table = self.query_one("#units-table", DataTable)
+
+        status.update("✅ No more recipes to process!")
+        progress_bar.update(total=100, progress=100)
+        create_btn.disabled = True
+        next_btn.disabled = True
+        table.clear()
+        table.add_row("No more recipes", "N/A", "All batches processed")
+
+    async def _process_single_recipe(self, recipe: dict) -> dict:
+        """Process a single recipe and extract missing units.
+
+        Parameters
+        ----------
+        recipe : dict
+            Recipe to process
+
+        Returns
+        -------
+        dict
+            Dictionary of missing units with their info
+
+        Raises
+        ------
+        Exception
+            If recipe processing fails
+        """
+        details = await get_recipe_details(self.session, recipe["slug"])
+        recipe_ingredients = details.get("recipeIngredient") or []
+
+        # Extract raw ingredients
+        raw_ingredients = []
+        for ing in recipe_ingredients:
+            if isinstance(ing, dict):
+                text = ing.get("note") or ing.get("originalText") or ""
+                if text:
+                    raw_ingredients.append(text)
+            elif isinstance(ing, str):
+                raw_ingredients.append(ing)
+
+        if raw_ingredients:
+            # Parse ingredients
+            parsed = await parse_ingredients(self.session, raw_ingredients)
+            self.all_parsed_ingredients.extend(parsed)
+
+            # Extract missing units
+            return extract_missing_units(parsed, self.known_units_full)
+
+        return {}
+
+    def _aggregate_missing_units(self, all_missing: dict, missing: dict) -> None:
+        """Aggregate missing units into combined dictionary.
+
+        Parameters
+        ----------
+        all_missing : dict
+            Aggregated missing units dictionary (modified in place)
+        missing : dict
+            Missing units from current recipe
+        """
+        for unit_name, info in missing.items():
+            if unit_name not in all_missing:
+                all_missing[unit_name] = {
+                    "suggestion": info["suggestion"],
+                    "count": 0,
+                    "ingredients": [],
+                }
+            all_missing[unit_name]["count"] += info["count"]
+            all_missing[unit_name]["ingredients"].extend(info["ingredients"])
+
+    def _populate_results_table(self, recipe_count: int, batch_end: int) -> None:
+        """Populate table with results and update UI state.
+
+        Parameters
+        ----------
+        recipe_count : int
+            Number of recipes successfully processed
+        batch_end : int
+            End index of current batch
+        """
+        status = self.query_one("#status-bar", Static)
+        table = self.query_one("#units-table", DataTable)
+        create_btn = self.query_one("#create-btn", Button)
+        next_btn = self.query_one("#next-btn", Button)
+
+        table.clear()
+
+        if not self.missing_units:
+            status.update("✅ No missing units found in this batch! Recipes are already well-parsed.")
+            create_btn.disabled = True
+            table.add_row("No missing units", "N/A", "Nothing to do in this batch")
+        else:
+            for unit_name, info in sorted(self.missing_units.items()):
+                table.add_row(
+                    unit_name,
+                    str(info["count"]),
+                    f"Create '{info['suggestion']}'",
+                )
+
+            create_btn.disabled = False
+            status.update(
+                f"📊 Found {len(self.missing_units)} unique missing units across {recipe_count} recipes. Ready to create!"
+            )
+
+        # Update "Next Batch" button state
+        remaining_recipes = len(self.unparsed_recipes) - batch_end
+        if remaining_recipes > 0:
+            next_btn.disabled = False
+            next_btn.label = f"Load Next Batch ({remaining_recipes} left) [N]"
+        else:
+            next_btn.disabled = True
+            next_btn.label = "No More Batches [N]"
+
+    async def load_batch_data(self) -> None:
+        """Load and parse ingredients from batch of recipes."""
         try:
             status = self.query_one("#status-bar", Static)
             progress_bar = self.query_one("#progress-bar", ProgressBar)
 
             # Determine batch range
             batch_end = min(self.current_batch_start + BATCH_SIZE, len(self.unparsed_recipes))
-            self.batch_recipes = self.unparsed_recipes[self.current_batch_start:batch_end]
+            self.batch_recipes = self.unparsed_recipes[self.current_batch_start : batch_end]
 
             total_recipes = len(self.batch_recipes)
 
             if total_recipes == 0:
-                status.update("✅ No more recipes to process!")
-                progress_bar.update(total=100, progress=100)
-                create_btn = self.query_one("#create-btn", Button)
-                next_btn = self.query_one("#next-btn", Button)
-                create_btn.disabled = True
-                next_btn.disabled = True
-
-                table = self.query_one("#units-table", DataTable)
-                table.clear()
-                table.add_row("No more recipes", "N/A", "All batches processed")
+                self._handle_empty_batch()
                 return
 
             status.update(f"⏳ Loading {total_recipes} recipes (batch {self.current_batch_start + 1}-{batch_end})...")
@@ -178,39 +293,13 @@ class BatchUnitsScreen(Screen):
                     progress_bar.update(progress=idx + 1)
                     status.update(f"⏳ Processing recipe {idx + 1}/{total_recipes}: {recipe['name'][:40]}...")
 
-                    details = await get_recipe_details(self.session, recipe["slug"])
-                    recipe_ingredients = details.get("recipeIngredient") or []
+                    # Process recipe and get missing units
+                    missing = await self._process_single_recipe(recipe)
 
-                    # Extract raw ingredients
-                    raw_ingredients = []
-                    for ing in recipe_ingredients:
-                        if isinstance(ing, dict):
-                            text = ing.get("note") or ing.get("originalText") or ""
-                            if text:
-                                raw_ingredients.append(text)
-                        elif isinstance(ing, str):
-                            raw_ingredients.append(ing)
+                    # Aggregate missing units
+                    self._aggregate_missing_units(all_missing, missing)
 
-                    if raw_ingredients:
-                        # Parse ingredients
-                        parsed = await parse_ingredients(self.session, raw_ingredients)
-                        self.all_parsed_ingredients.extend(parsed)
-
-                        # Extract missing units
-                        missing = extract_missing_units(parsed, self.known_units_full)
-
-                        # Aggregate missing units
-                        for unit_name, info in missing.items():
-                            if unit_name not in all_missing:
-                                all_missing[unit_name] = {
-                                    "suggestion": info["suggestion"],
-                                    "count": 0,
-                                    "ingredients": [],
-                                }
-                            all_missing[unit_name]["count"] += info["count"]
-                            all_missing[unit_name]["ingredients"].extend(info["ingredients"])
-
-                        recipe_count += 1
+                    recipe_count += 1
 
                 except Exception as e:
                     logger.error(f"Error processing recipe {recipe['name']}: {e}")
@@ -218,39 +307,8 @@ class BatchUnitsScreen(Screen):
 
             self.missing_units = all_missing
 
-            # Populate table
-            table = self.query_one("#units-table", DataTable)
-            table.clear()
-
-            if not self.missing_units:
-                status.update("✅ No missing units found in this batch! Recipes are already well-parsed.")
-                create_btn = self.query_one("#create-btn", Button)
-                create_btn.disabled = True
-                table.add_row("No missing units", "N/A", "Nothing to do in this batch")
-            else:
-                for unit_name, info in sorted(self.missing_units.items()):
-                    table.add_row(
-                        unit_name,
-                        str(info["count"]),
-                        f"Create '{info['suggestion']}'",
-                    )
-
-                create_btn = self.query_one("#create-btn", Button)
-                create_btn.disabled = False
-
-                status.update(
-                    f"📊 Found {len(self.missing_units)} unique missing units across {recipe_count} recipes. Ready to create!"
-                )
-
-            # Update "Next Batch" button state
-            next_btn = self.query_one("#next-btn", Button)
-            remaining_recipes = len(self.unparsed_recipes) - batch_end
-            if remaining_recipes > 0:
-                next_btn.disabled = False
-                next_btn.label = f"Load Next Batch ({remaining_recipes} left) [N]"
-            else:
-                next_btn.disabled = True
-                next_btn.label = "No More Batches [N]"
+            # Populate table with results
+            self._populate_results_table(recipe_count, batch_end)
 
         except Exception as e:
             logger.error(f"Error loading batch data: {e}", exc_info=True)
@@ -273,7 +331,7 @@ class BatchUnitsScreen(Screen):
             created_count = 0
             skipped_count = 0
 
-            for unit_name, info in self.missing_units.items():
+            for _unit_name, info in self.missing_units.items():
                 suggestion = info["suggestion"]
 
                 # Check if this unit already exists
@@ -304,9 +362,7 @@ class BatchUnitsScreen(Screen):
                 timeout=10,
             )
 
-            status.update(
-                f"✅ Success! Created {created_count} units, re-parsed {reparsed_count} recipes"
-            )
+            status.update(f"✅ Success! Created {created_count} units, re-parsed {reparsed_count} recipes")
 
             # Wait a bit to show the message, then return
             await asyncio.sleep(2)

@@ -1,18 +1,22 @@
 """Logging configuration for Mealie Ingredient Parser."""
 
-import logging
 import sys
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
+
+from loguru import logger
 
 
-def setup_logging(log_level=logging.INFO):
+def setup_logging(log_level="INFO"):
     """
-    Configure logging with both file and console handlers.
+    Configure logging with both file and console handlers using loguru.
 
     Creates a logs directory and writes to timestamped log files.
     Also outputs to console for immediate feedback.
     """
+    # Remove default handler
+    logger.remove()
+
     # Create logs directory
     log_dir = Path("logs")
     log_dir.mkdir(exist_ok=True)
@@ -21,36 +25,26 @@ def setup_logging(log_level=logging.INFO):
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     log_file = log_dir / f"mealie_parser_{timestamp}.log"
 
-    # Create formatter
-    formatter = logging.Formatter(
-        fmt="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S"
+    # File handler - captures all logs with DEBUG level
+    logger.add(
+        log_file,
+        format="{time:YYYY-MM-DD HH:mm:ss} - {name}:{function}:{line} - {level} - {message}",
+        level="DEBUG",
+        encoding="utf-8",
+        backtrace=True,
+        diagnose=True,
     )
 
-    # File handler - captures all logs
-    file_handler = logging.FileHandler(log_file, encoding="utf-8")
-    file_handler.setLevel(logging.DEBUG)
-    file_handler.setFormatter(formatter)
-
-    # Console handler - only warnings and errors
-    console_handler = logging.StreamHandler(sys.stdout)
-    console_handler.setLevel(logging.WARNING)
-    console_handler.setFormatter(formatter)
-
-    # Configure root logger
-    root_logger = logging.getLogger()
-    root_logger.setLevel(log_level)
-    root_logger.addHandler(file_handler)
-    root_logger.addHandler(console_handler)
+    # Console handler - only errors and critical
+    logger.add(
+        sys.stdout,
+        format="{time:YYYY-MM-DD HH:mm:ss} - {name}:{function}:{line} - {level} - {message}",
+        level="ERROR",
+        colorize=True,
+    )
 
     # Log startup
-    logger = logging.getLogger(__name__)
     logger.info(f"Logging initialized. Log file: {log_file}")
-    logger.info(f"Log level: {logging.getLevelName(log_level)}")
+    logger.info(f"Log level: {log_level}")
 
     return log_file
-
-
-def get_logger(name):
-    """Get a logger instance for a specific module."""
-    return logging.getLogger(name)

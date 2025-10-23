@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Entry point for the Mealie Ingredient Parser application."""
 
-import logging
+from loguru import logger
+
 from mealie_parser.app import MealieParserApp
 from mealie_parser.logging_config import setup_logging
 
@@ -9,8 +10,7 @@ from mealie_parser.logging_config import setup_logging
 def main():
     """Run the Mealie Parser application."""
     # Initialize logging
-    log_file = setup_logging(log_level=logging.INFO)
-    logger = logging.getLogger(__name__)
+    log_file = setup_logging(log_level="INFO")
 
     try:
         logger.info("=" * 60)
@@ -23,7 +23,7 @@ def main():
 
         logger.info("Application exited normally")
     except Exception as e:
-        logger.critical(f"Application crashed: {e}", exc_info=True)
+        logger.critical(f"Application crashed: {e}")
         raise
 
 
