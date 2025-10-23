@@ -6,7 +6,7 @@ from textual.app import ComposeResult
 from textual.binding import Binding
 from textual.containers import Container, Horizontal
 from textual.screen import Screen
-from textual.widgets import Button, DataTable, Footer, Static
+from textual.widgets import Button, DataTable, Footer, Header, Static
 
 from ..api import get_foods_full, get_recipe_details, get_units_full, parse_ingredients
 from .ingredient_review import IngredientReviewScreen
@@ -85,6 +85,7 @@ class RecipeListScreen(Screen):
         }
 
     def compose(self) -> ComposeResult:
+        yield Header()
         with Container(id="title-bar"):
             yield Static("Recipe Mode", id="title")
         with Horizontal(id="controls"):

@@ -13,6 +13,7 @@ from textual.widgets import (
     Button,
     DataTable,
     Footer,
+    Header,
     LoadingIndicator,
     Static,
     Switch,
@@ -294,6 +295,7 @@ class PatternGroupScreen(Screen):
 
     def compose(self) -> ComposeResult:
         """Compose the screen layout."""
+        yield Header()
         with Container(id="title-bar"):
             yield Static("Batch Mode", id="title")
         with Horizontal(id="controls"):

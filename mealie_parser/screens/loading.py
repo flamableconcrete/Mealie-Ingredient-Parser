@@ -6,7 +6,7 @@ from loguru import logger
 from textual.app import ComposeResult
 from textual.containers import Container
 from textual.screen import Screen
-from textual.widgets import Label, ProgressBar
+from textual.widgets import Header, Label, ProgressBar
 
 from ..api import get_all_recipes, get_foods_full, get_recipe_details, get_units_full
 from ..modals.session_resume_modal import SessionResumeModal
@@ -62,6 +62,7 @@ class LoadingScreen(Screen):
     """
 
     def compose(self) -> ComposeResult:
+        yield Header()
         with Container(id="loading-container"):
             yield Label("[bold cyan]MEALIE INGREDIENT PARSER   [/]", id="loading-animated-title")
             yield Label(
