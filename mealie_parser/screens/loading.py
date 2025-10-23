@@ -6,7 +6,7 @@ from loguru import logger
 from textual.app import ComposeResult
 from textual.containers import Container
 from textual.screen import Screen
-from textual.widgets import Header, Label, ProgressBar
+from textual.widgets import Header, Label, LoadingIndicator, ProgressBar
 
 from ..api import get_all_recipes, get_foods_full, get_recipe_details, get_units_full
 from ..modals.session_resume_modal import SessionResumeModal
@@ -33,10 +33,17 @@ class LoadingScreen(Screen):
         padding: 2 4;
     }
 
-    #loading-animated-title {
+    #loading-title {
         text-align: center;
         margin: 0;
         height: 1;
+    }
+
+    #loading-indicator {
+        width: auto;
+        height: 1;
+        margin: 1 0;
+        content-align: center middle;
     }
 
     #loading-subtitle {
@@ -64,7 +71,8 @@ class LoadingScreen(Screen):
     def compose(self) -> ComposeResult:
         yield Header()
         with Container(id="loading-container"):
-            yield Label("[bold cyan]MEALIE INGREDIENT PARSER   [/]", id="loading-animated-title")
+            yield Label("[bold cyan]MEALIE INGREDIENT PARSER[/]", id="loading-title")
+            yield LoadingIndicator(id="loading-indicator")
             yield Label(
                 "[italic dim]Fetching recipes, units, and foods[/]",
                 id="loading-subtitle",
@@ -77,25 +85,8 @@ class LoadingScreen(Screen):
             yield ProgressBar(id="foods-progress", show_eta=False)
 
     async def on_mount(self):
-        # Start the animated title
-        asyncio.create_task(self.animate_title())
         # Load data in background
         asyncio.create_task(self.load_data())
-
-    async def animate_title(self):
-        """Animate the loading dots in the title"""
-        animated_label = self.query_one("#loading-animated-title", Label)
-        dots = [".", "..", "...", ""]
-        idx = 0
-
-        while True:
-            try:
-                animated_label.update(f"[bold cyan]MEALIE INGREDIENT PARSER{dots[idx]}[/]")
-                idx = (idx + 1) % len(dots)
-                await asyncio.sleep(0.5)
-            except Exception:
-                # Screen might be unmounting
-                break
 
     async def _handle_existing_session(self) -> None:
         """Check for and handle existing session state.
