@@ -8,7 +8,7 @@ Mealie Ingredient Parser is a Textual TUI application for processing unparsed re
 
 ## Code Style and Quality
 
-**IMPORTANT:** This project follows strict Python coding standards documented in [STYLE_GUIDE.md](STYLE_GUIDE.md).
+**IMPORTANT:** This project follows strict Python coding standards documented in [STYLE_GUIDE.md](docs/STYLE_GUIDE.md).
 
 ### Quick Reference
 
@@ -42,7 +42,7 @@ uv run ruff check --fix path/to/file.py
 - **Constants:** `UPPER_SNAKE_CASE` (e.g., `MAX_RETRIES`)
 - **Boolean functions:** Prefix with `is_`, `has_`, `should_`
 
-See [STYLE_GUIDE.md](STYLE_GUIDE.md) for complete guidelines.
+See [STYLE_GUIDE.md](docs/STYLE_GUIDE.md) for complete guidelines.
 
 ## Environment Setup
 
