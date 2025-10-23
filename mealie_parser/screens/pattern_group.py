@@ -112,6 +112,17 @@ class PatternGroupScreen(Screen):
         margin: 0 1;
     }
 
+    .switch-label {
+        margin: 0 1;
+        width: auto;
+        height: 3;
+        content-align: left middle;
+    }
+
+    #hide-matched-food, #hide-matched-unit {
+        margin: 0 1;
+    }
+
     TabbedContent {
         height: 1fr;
     }
@@ -294,15 +305,15 @@ class PatternGroupScreen(Screen):
                 with Container(id="food-controls"):
                     with Horizontal(classes="controls-inner"):
                         yield Button("Select All Unmatched", id="toggle-food", variant="primary")
-                        yield Switch(value=False, id="hide-matched-food")
                         yield Static("Hide Matched", classes="switch-label")
+                        yield Switch(value=False, id="hide-matched-food")
                 yield DataTable(id="food-table")
             with TabPane("Unit Patterns", id="units"), Vertical():
                 with Container(id="unit-controls"):
                     with Horizontal(classes="controls-inner"):
                         yield Button("Select All Unmatched", id="toggle-unit", variant="primary")
-                        yield Switch(value=False, id="hide-matched-unit")
                         yield Static("Hide Matched", classes="switch-label")
+                        yield Switch(value=False, id="hide-matched-unit")
                 yield DataTable(id="unit-table")
         yield LoadingIndicator()
         yield Static(id="status-bar")
