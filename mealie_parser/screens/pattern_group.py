@@ -100,10 +100,15 @@ class PatternGroupScreen(Screen):
         height: auto;
         background: $panel;
         padding: 0 1;
-        align: left middle;
+        align: center middle;
     }
 
-    #food-controls Button, #unit-controls Button {
+    .controls-inner {
+        width: auto;
+        height: auto;
+    }
+
+    .controls-inner Button {
         margin: 0 1;
     }
 
@@ -286,16 +291,18 @@ class PatternGroupScreen(Screen):
             yield Button("Start Parsing [p]", id="start-parsing", variant="primary")
         with TabbedContent(initial="foods"):
             with TabPane("Food Patterns", id="foods"), Vertical():
-                with Horizontal(id="food-controls"):
-                    yield Button("Select All Unmatched", id="toggle-food", variant="primary")
-                    yield Switch(value=False, id="hide-matched-food")
-                    yield Static("Hide Matched", classes="switch-label")
+                with Container(id="food-controls"):
+                    with Horizontal(classes="controls-inner"):
+                        yield Button("Select All Unmatched", id="toggle-food", variant="primary")
+                        yield Switch(value=False, id="hide-matched-food")
+                        yield Static("Hide Matched", classes="switch-label")
                 yield DataTable(id="food-table")
             with TabPane("Unit Patterns", id="units"), Vertical():
-                with Horizontal(id="unit-controls"):
-                    yield Button("Select All Unmatched", id="toggle-unit", variant="primary")
-                    yield Switch(value=False, id="hide-matched-unit")
-                    yield Static("Hide Matched", classes="switch-label")
+                with Container(id="unit-controls"):
+                    with Horizontal(classes="controls-inner"):
+                        yield Button("Select All Unmatched", id="toggle-unit", variant="primary")
+                        yield Switch(value=False, id="hide-matched-unit")
+                        yield Static("Hide Matched", classes="switch-label")
                 yield DataTable(id="unit-table")
         yield LoadingIndicator()
         yield Static(id="status-bar")
