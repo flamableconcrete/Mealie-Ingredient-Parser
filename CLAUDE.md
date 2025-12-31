@@ -128,6 +128,18 @@ Environment variables are loaded from `.env`:
 - `MEALIE_URL`: Base URL for Mealie API (e.g., <https://mealie.example.com/api>)
 - `BATCH_SIZE`: Number of items to process in parallel (default: 10)
 
+**Column Width Configuration (Batch Mode):**
+
+Users can customize the width of columns in batch mode tables by setting these environment variables:
+
+- `COLUMN_WIDTH_PATTERN_TEXT`: Width of the "Pattern Text" column (default: 50)
+- `COLUMN_WIDTH_STATUS`: Width of the "Status" column (default: 15)
+- `COLUMN_WIDTH_PARSED_UNIT`: Width of the "Parsed Unit" column (default: 40)
+- `COLUMN_WIDTH_PARSED_FOOD`: Width of the "Parsed Food" column (default: 40)
+- `COLUMN_WIDTH_CREATE`: Width of the "Create" checkbox column (default: 8)
+
+These settings allow users to adjust column widths based on their terminal size or data requirements.
+
 ## Code Style
 
 - Python 3.13+ required

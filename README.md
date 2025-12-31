@@ -24,13 +24,16 @@ A Terminal User Interface (TUI) application for processing unparsed recipe ingre
    ```
 
 2. **Configure environment**:
-   Create a `.env` file with your Mealie credentials:
+   Copy `.env.example` to `.env` and fill in your values:
 
-   ```env
-   MEALIE_API_KEY=your_api_key_here
-   MEALIE_URL=https://your-mealie-instance.com/api
-   BATCH_SIZE=10
+   ```bash
+   cp .env.example .env
    ```
+
+   Then edit `.env` with your Mealie credentials:
+   - `MEALIE_API_KEY`: Your API key from Mealie (Settings -> API Tokens)
+   - `MEALIE_URL`: Your Mealie instance URL ending with `/api`
+   - Optional settings for batch size and column widths (see `.env.example` for details)
 
 3. **Install dependencies**:
 

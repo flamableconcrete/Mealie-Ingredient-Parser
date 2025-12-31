@@ -22,6 +22,13 @@ from textual.widgets import (
 )
 
 from mealie_parser.api import get_foods_full, get_recipe_details, parse_ingredients
+from mealie_parser.config import (
+    COLUMN_WIDTH_CREATE,
+    COLUMN_WIDTH_PARSED_FOOD,
+    COLUMN_WIDTH_PARSED_UNIT,
+    COLUMN_WIDTH_PATTERN_TEXT,
+    COLUMN_WIDTH_STATUS,
+)
 from mealie_parser.modals.data_management_modal import DataManagementModal
 from mealie_parser.modals.parse_config_modal import ParseConfigModal
 from mealie_parser.models.pattern import PatternGroup, PatternStatus
@@ -97,11 +104,16 @@ class PatternGroupScreen(Screen):
         min-width: 20;
     }
 
+    #start-parsing {
+        min-width: 22;
+    }
+
     #food-controls, #unit-controls {
         height: auto;
         background: $panel;
-        padding: 0 1;
-        align: center middle;
+        padding: 1 2;
+        align: right middle;
+        dock: bottom;
     }
 
     .controls-inner {
@@ -304,19 +316,19 @@ class PatternGroupScreen(Screen):
             yield Button("Start Parsing [p]", id="start-parsing", variant="primary")
         with TabbedContent(initial="foods"):
             with TabPane("Food Patterns", id="foods"), Vertical():
+                yield DataTable(id="food-table")
                 with Container(id="food-controls"):
                     with Horizontal(classes="controls-inner"):
                         yield Button("Select All Unmatched", id="toggle-food", variant="primary")
                         yield Static("Hide Matched", classes="switch-label")
                         yield Switch(value=False, id="hide-matched-food")
-                yield DataTable(id="food-table")
             with TabPane("Unit Patterns", id="units"), Vertical():
+                yield DataTable(id="unit-table")
                 with Container(id="unit-controls"):
                     with Horizontal(classes="controls-inner"):
                         yield Button("Select All Unmatched", id="toggle-unit", variant="primary")
                         yield Static("Hide Matched", classes="switch-label")
                         yield Switch(value=False, id="hide-matched-unit")
-                yield DataTable(id="unit-table")
         yield LoadingIndicator()
         yield Static(id="status-bar")
         yield Footer()
@@ -333,10 +345,10 @@ class PatternGroupScreen(Screen):
         logger.info("PatternGroupScreen._initialize_tables: Starting table initialization")
         # Create table managers to handle all table state
         unit_column_config = [
-            ("Pattern Text", 50),
-            ("Status", 15),
-            ("Parsed Unit", 20),
-            ("Create", 8),
+            ("Pattern Text", COLUMN_WIDTH_PATTERN_TEXT),
+            ("Status", COLUMN_WIDTH_STATUS),
+            ("Parsed Unit", COLUMN_WIDTH_PARSED_UNIT),
+            ("Create", COLUMN_WIDTH_CREATE),
         ]
         self.unit_table_manager = PatternTableManager(
             patterns=self.patterns,
@@ -345,10 +357,10 @@ class PatternGroupScreen(Screen):
             column_widths=unit_column_config,
         )
         food_column_config = [
-            ("Pattern Text", 50),
-            ("Status", 15),
-            ("Parsed Food", 20),
-            ("Create", 8),
+            ("Pattern Text", COLUMN_WIDTH_PATTERN_TEXT),
+            ("Status", COLUMN_WIDTH_STATUS),
+            ("Parsed Food", COLUMN_WIDTH_PARSED_FOOD),
+            ("Create", COLUMN_WIDTH_CREATE),
         ]
         self.food_table_manager = PatternTableManager(
             patterns=self.patterns,
@@ -1412,7 +1424,6 @@ class PatternGroupScreen(Screen):
                 self.session,
                 name=unit_name,
                 abbreviation=unit_name[:3],
-                description=f"Created from pattern: {pattern.pattern_text}",
             )
             logger.info(f"Created unit: {created_unit['name']} (ID: {created_unit['id']})")
             self.notify(f"Created unit: {unit_name}", severity="information", timeout=3)
@@ -1430,7 +1441,6 @@ class PatternGroupScreen(Screen):
                 self.session,
                 name=unit_name,
                 abbreviation=unit_name[:3],
-                description=f"Created from pattern: {pattern.pattern_text}",
             )
             logger.info(f"Created unit: {created_unit['name']} (ID: {created_unit['id']})")
 
@@ -1446,6 +1456,9 @@ class PatternGroupScreen(Screen):
 
         # Refresh units cache and mark pattern as matched
         self.known_units = await get_units_full(self.session)
+        # Transition through QUEUED first (UNMATCHED → QUEUED → MATCHED)
+        if pattern.unit_status == PatternStatus.UNMATCHED:
+            pattern.transition_unit_to(PatternStatus.QUEUED)
         pattern.transition_unit_to(PatternStatus.MATCHED)
         self.refresh_both_tables()
 
@@ -1470,7 +1483,6 @@ class PatternGroupScreen(Screen):
             created_food = await create_food(
                 self.session,
                 name=food_name,
-                description=f"Created from pattern: {pattern.pattern_text}",
             )
             logger.info(f"Created food: {created_food['name']} (ID: {created_food['id']})")
             self.notify(f"Created food: {food_name}", severity="information", timeout=3)
@@ -1487,7 +1499,6 @@ class PatternGroupScreen(Screen):
             created_food = await create_food(
                 self.session,
                 name=food_name,
-                description=f"Created from pattern: {pattern.pattern_text}",
             )
             logger.info(f"Created food: {created_food['name']} (ID: {created_food['id']})")
 
@@ -1503,6 +1514,9 @@ class PatternGroupScreen(Screen):
 
         # Refresh foods cache and mark pattern as matched
         await self.refresh_food_cache()
+        # Transition through QUEUED first (UNMATCHED → QUEUED → MATCHED)
+        if pattern.food_status == PatternStatus.UNMATCHED:
+            pattern.transition_food_to(PatternStatus.QUEUED)
         pattern.transition_food_to(PatternStatus.MATCHED)
         self.refresh_both_tables()
 

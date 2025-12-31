@@ -75,9 +75,9 @@ class ModeSelectionScreen(Screen):
     """
 
     BINDINGS = [
+        Binding("escape", "quit_with_confirmation", "Quit", show=True),
         Binding("1", "recipe_mode", "Recipe Mode", show=True),
         Binding("2", "batch_mode", "Batch Mode", show=True),
-        Binding("q", "quit", "Quit", show=True),
     ]
 
     def __init__(
@@ -121,7 +121,7 @@ class ModeSelectionScreen(Screen):
                 yield Button("Start Batch Mode [2]", variant="success", id="batch-mode-btn")
 
             with Horizontal(id="quit-container"):
-                yield Button("Quit [q]", variant="error", id="quit-btn")
+                yield Button("Quit [Esc]", variant="error", id="quit-btn")
 
         yield Footer()
 
@@ -131,7 +131,7 @@ class ModeSelectionScreen(Screen):
         elif event.button.id == "batch-mode-btn":
             self.action_batch_mode()
         elif event.button.id == "quit-btn":
-            self.action_quit()
+            self.action_quit_with_confirmation()
 
     def action_recipe_mode(self) -> None:
         """Switch to recipe-by-recipe processing mode"""
@@ -157,5 +157,6 @@ class ModeSelectionScreen(Screen):
             )
         )
 
-    def action_quit(self) -> None:
+    def action_quit_with_confirmation(self) -> None:
+        """Quit application (triggered by Escape key or quit button)."""
         self.app.exit()

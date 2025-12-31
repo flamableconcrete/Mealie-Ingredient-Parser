@@ -3,7 +3,7 @@
 import aiohttp
 from textual.app import App
 
-from .config import headers
+from .config import API_URL, headers
 from .screens import LoadingScreen
 
 
@@ -17,6 +17,7 @@ class MealieParserApp(App):
     """
 
     TITLE = "Mealie Ingredient Parser"
+    SUB_TITLE = f"Connected to: {API_URL}"
 
     def __init__(self):
         super().__init__()
