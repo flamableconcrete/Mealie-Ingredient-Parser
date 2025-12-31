@@ -280,3 +280,69 @@ class PatternTableManager:
         logger.info(
             f"PatternTableManager.refresh_table: Finished for {self.table_id}. Showing {row_idx}/{len(self.patterns)} patterns"
         )
+
+    def update_pattern_row(
+        self,
+        table: DataTable,
+        pattern_index: int,
+        pattern: PatternGroup,
+    ) -> None:
+        """
+        Update a specific row in the table with current pattern data.
+
+        Parameters
+        ----------
+        table : DataTable
+            The table widget to update
+        pattern_index : int
+            Index of the pattern in self.patterns (NOT display row index)
+        pattern : PatternGroup
+            The pattern with updated data
+        """
+        from textual.widgets._data_table import CellDoesNotExist
+
+        # Check if this pattern has a row key (it might be hidden)
+        if pattern_index not in self.row_keys:
+            logger.debug(
+                f"PatternTableManager.update_pattern_row: Pattern index {pattern_index} not in row_keys (likely hidden)"
+            )
+            return
+
+        row_key = self.row_keys[pattern_index]
+
+        # Get current status and values
+        status = self.get_pattern_status(pattern)
+        status_display = self.get_status_display(status)
+        parsed_value = self.get_parsed_value(pattern)
+        create_cell = self.get_checkbox_value(status)
+
+        # Get column keys from the table
+        columns = list(table.columns.keys())
+        if len(columns) < 4:
+            logger.warning(f"PatternTableManager.update_pattern_row: Expected 4 columns, got {len(columns)}")
+            return
+
+        pattern_text_col = columns[0]
+        status_col = columns[1]
+        parsed_col = columns[2]
+        create_col = columns[3]
+
+        try:
+            # Update cells
+            table.update_cell(row_key, pattern_text_col, pattern.pattern_text)
+            table.update_cell(row_key, status_col, status_display)
+            table.update_cell(row_key, parsed_col, parsed_value)
+            table.update_cell(row_key, create_col, create_cell)
+
+            logger.debug(
+                f"PatternTableManager.update_pattern_row: Updated pattern '{pattern.pattern_text}' at index {pattern_index}"
+            )
+        except CellDoesNotExist:
+            logger.warning(
+                f"PatternTableManager.update_pattern_row: Cell does not exist for pattern index {pattern_index}"
+            )
+        except Exception as e:
+            logger.error(
+                f"PatternTableManager.update_pattern_row: Error updating row for pattern {pattern_index}: {e}",
+                exc_info=True,
+            )
