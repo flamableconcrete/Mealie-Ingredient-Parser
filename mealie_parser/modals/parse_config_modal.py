@@ -3,11 +3,11 @@
 from loguru import logger
 from textual.app import ComposeResult
 from textual.containers import Container, Horizontal
-from textual.screen import Screen
+from textual.screen import ModalScreen
 from textual.widgets import Button, Label, Select, Static
 
 
-class ParseConfigModal(Screen[dict[str, str | int] | None]):
+class ParseConfigModal(ModalScreen[dict[str, str | int] | None]):
     """
     Modal for selecting parsing quantity and method.
 
@@ -20,7 +20,7 @@ class ParseConfigModal(Screen[dict[str, str | int] | None]):
     CSS = """
     ParseConfigModal {
         layers: overlay;
-        background: rgba(0, 0, 0, 0);
+        background: rgba(0, 0, 0, 0.7);
         align: center middle;
     }
 

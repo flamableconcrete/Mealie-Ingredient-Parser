@@ -21,16 +21,16 @@ class LoadingScreen(Screen):
 
     CSS = """
     LoadingScreen {
-        align: center middle;
         background: $surface;
+        align: center middle;
     }
 
     #loading-container {
-        width: 70;
+        width: 80;
         height: auto;
         background: $panel;
         border: thick $primary;
-        padding: 2 4;
+        padding: 1 2;
     }
 
     #loading-title {
@@ -42,22 +42,22 @@ class LoadingScreen(Screen):
     #loading-indicator {
         width: auto;
         height: 1;
-        margin: 1 0;
+        margin: 0;
         content-align: center middle;
     }
 
     #loading-subtitle {
         text-align: center;
-        margin: 0 0 2 0;
+        margin: 0;
     }
 
     Label {
         text-align: center;
-        margin: 1 0;
+        margin: 0;
     }
 
     ProgressBar {
-        margin: 1 0;
+        margin: 0;
     }
 
     .progress-label {
