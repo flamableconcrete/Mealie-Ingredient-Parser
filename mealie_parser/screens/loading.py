@@ -30,25 +30,26 @@ class LoadingScreen(Screen):
         height: auto;
         background: $panel;
         border: thick $primary;
-        padding: 1 2;
+        padding: 2 4;
+        align-horizontal: center;
     }
 
     #loading-title {
         text-align: center;
-        margin: 0;
+        margin: 0 0 1 0;
         height: 1;
     }
 
     #loading-indicator {
         width: auto;
         height: 1;
-        margin: 0;
+        margin: 0 0 1 0;
         content-align: center middle;
     }
 
     #loading-subtitle {
         text-align: center;
-        margin: 0;
+        margin: 0 0 1 0;
     }
 
     Label {
@@ -57,7 +58,7 @@ class LoadingScreen(Screen):
     }
 
     ProgressBar {
-        margin: 0;
+        margin: 0 0 1 0;
     }
 
     .progress-label {
@@ -83,8 +84,16 @@ class LoadingScreen(Screen):
             yield ProgressBar(id="units-progress", show_eta=False)
             yield Label("", id="foods-label", classes="progress-label")
             yield ProgressBar(id="foods-progress", show_eta=False)
+            yield Label("Finding unparsed recipes...", id="unparsed-label", classes="progress-label")
+            yield ProgressBar(id="unparsed-progress", show_eta=False)
 
     async def on_mount(self):
+        # Initialize all progress bars to prevent animation before they're used
+        self.query_one("#recipes-progress", ProgressBar).update(total=1, progress=0)
+        self.query_one("#units-progress", ProgressBar).update(total=1, progress=0)
+        self.query_one("#foods-progress", ProgressBar).update(total=1, progress=0)
+        self.query_one("#unparsed-progress", ProgressBar).update(total=1, progress=0)
+
         # Load data in background
         asyncio.create_task(self.load_data())
 
@@ -210,10 +219,14 @@ class LoadingScreen(Screen):
             Tuple of (unparsed_recipes, unparsed_recipe_details)
         """
         logger.info(f"Checking {len(recipes)} recipes for unparsed ingredients")
+        unparsed_progress = self.query_one("#unparsed-progress", ProgressBar)
+
+        unparsed_progress.update(total=len(recipes), progress=0)
+
         unparsed_recipes = []
         unparsed_recipe_details = []
 
-        for recipe in recipes:
+        for idx, recipe in enumerate(recipes, 1):
             try:
                 details = await get_recipe_details(session, recipe["slug"])
                 recipe_ingredients = details.get("recipeIngredient") or []
@@ -221,6 +234,9 @@ class LoadingScreen(Screen):
                 if recipe_ingredients and is_recipe_unparsed(recipe_ingredients):
                     unparsed_recipes.append(recipe)
                     unparsed_recipe_details.append(details)
+
+                # Update progress
+                unparsed_progress.update(progress=idx)
             except Exception as e:
                 logger.error(
                     f"Error checking recipe '{recipe.get('name', 'unknown')}' (slug: {recipe.get('slug', 'unknown')}): {e}",

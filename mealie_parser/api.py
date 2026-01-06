@@ -260,8 +260,12 @@ async def add_food_alias(session, food_id, alias):
             food = await r.json()
 
         aliases = food.get("aliases", [])
-        if alias.lower() not in [a.lower() for a in aliases]:
-            aliases.append(alias)
+        # Extract alias names from objects for comparison
+        alias_names = [a.get("name", a).lower() if isinstance(a, dict) else a.lower() for a in aliases]
+
+        if alias.lower() not in alias_names:
+            # Append as object with 'name' field
+            aliases.append({"name": alias})
             food["aliases"] = aliases
 
             async with session.put(f"{API_URL}/foods/{food_id}", json=food) as r:
@@ -286,8 +290,12 @@ async def add_unit_alias(session, unit_id, alias):
             unit = await r.json()
 
         aliases = unit.get("aliases", [])
-        if alias.lower() not in [a.lower() for a in aliases]:
-            aliases.append(alias)
+        # Extract alias names from objects for comparison
+        alias_names = [a.get("name", a).lower() if isinstance(a, dict) else a.lower() for a in aliases]
+
+        if alias.lower() not in alias_names:
+            # Append as object with 'name' field
+            aliases.append({"name": alias})
             unit["aliases"] = aliases
 
             async with session.put(f"{API_URL}/units/{unit_id}", json=unit) as r:
